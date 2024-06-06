@@ -1,4 +1,4 @@
-![img.png](img.png)
+
 # Sistema avaliador de crédito
 
 ## Descrição do projeto:
