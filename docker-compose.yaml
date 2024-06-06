@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+
+  ms-cartoes:
+    image: mscartoes-andreiadev
+    hostname: 6598e6954edc
+    environment:
+      - RABBITMQ_SERVER=rabbitmq
+      - EUREKA_SERVER=eureka
+    depends_on:
+      - eureka
+      - rabbitmq
+    networks:
+      - network-andreiadev
+
+  rabbitmq:
+    image: rabbitmq-andreiadev
+    hostname: 7bfa6994c517
+    environment:
+      - PATH=/opt/rabbitmq/sbin:/opt/erlang/bin:/opt/openssl/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+      - ERLANG_INSTALL_PATH_PREFIX=/opt/erlang
+      - OPENSSL_INSTALL_PATH_PREFIX=/opt/openssl
+      - RABBITMQ_DATA_DIR=/var/lib/rabbitmq
+      - RABBITMQ_VERSION=3.9.29
+      - RABBITMQ_PGP_KEY_ID=0x0A9AF2115F4687BD29803A206B73A36E6026DFCA
+      - RABBITMQ_HOME=/opt/rabbitmq
+      - HOME=/var/lib/rabbitmq
+      - LANG=C.UTF-8
+      - LANGUAGE=C.UTF-8
+      - LC_ALL=C.UTF-8
+    volumes:
+      - /var/lib/rabbitmq
+    networks:
+      - network-andreiadev
+
+  eureka:
+    image: eureka-andreiadev
+    hostname: 1b6200eacea1
+    ports:
+      - "8761:8761"
+    networks:
+      - network-andreiadev
+
+  gateway:
+    image: gateway-andreiadev
+    hostname: 1eb7a8e64d72
+    environment:
+      - EUREKA_SERVER=eureka
+    depends_on:
+      - eureka
+      - ms-cartoes
+      - ms-avaliador-credito
+      - ms-clientes
+      - rabbitmq
+    ports:
+      - "8080:8080"
+    networks:
+      - network-andreiadev
+
+  ms-clientes:
+    image: msclientes-andreiadev
+    hostname: e410ea7d6f1d
+    environment:
+      - EUREKA_SERVER=eureka
+    depends_on:
+      - eureka
+    networks:
+      - network-andreiadev
+
+  ms-avaliador-credito:
+    image: msavaliadorcredito-andreiadev
+    hostname: 9af97bca1991
+    environment:
+      - RABBITMQ_SERVER=rabbitmq
+      - EUREKA_SERVER=eureka
+    depends_on:
+      - eureka
+      - rabbitmq
+    networks:
+      - network-andreiadev
+
+networks:
+  network-andreiadev:
+    driver: bridge
